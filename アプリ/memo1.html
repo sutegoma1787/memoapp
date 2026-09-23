@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <link href="./main.css" rel="stylesheet">
+        <title>メモアプリ</title>
+    </head>
+    <body>
+        
+        <a href="./main.html">一覧へ</a>
+
+        <textarea id="memoTitle" maxlength="100" placeholder="タイトルを入力してください…"></textarea>
+
+        <textarea id="memoText" maxlength="1000" placeholder="メモを入力してください…"></textarea>
+
+        <div id="memo1_hist"></div>
+
+        <button onclick="memoSave()">保存</button>
+        <button class="histbutton" onclick="memoHist()">履歴表示</button>
+        <script>
+
+            window.onload = function() {
+                memoDisp();
+            }
+
+            //メモのタイトル、本文の値を表示する機能。textareaの中に、それぞれ表示する。                
+            function memoDisp(){
+                var memo_text_elm = document.getElementById("memoText");
+                var memo_title_elm = document.getElementById("memoTitle");
+
+                // localStrageに対応していないと、ここで終了する
+                if (!window.localStorage){
+                    alert("localstrage非対応");
+                    return;
+                }
+
+                // 本文を取得
+                var memo_text_get = window.localStorage.getItem("memo1_text");
+
+                // タイトルを取得
+                var memo_title_get = window.localStorage.getItem("memo1_title");
+                
+                // 履歴を取得するためのリストを形成。
+            　　const memo1_hist = [];
+                memo1_hist.push(window.localStorage.getItem("memo1_hist"))
+
+
+
+                memo_text_elm.innerHTML = memo_text_get;
+                memo_title_elm.innerHTML = memo_title_get;
+
+                if (!memo1_hist){
+                    window.localStorage.setItem("memo1_hist",JSON.stringify());
+                }
+            }
+
+            function memoSave(){
+                const time = new Date();
+                const memoTitle = document.getElementById("memoTitle").value;
+                const memoText = document.getElementById("memoText").value;
+                let memoHist = window.localStorage.getItem("memo1_hist");
+
+                if (memoText.trim() !== "" && memoTitle.trim() !== ""){
+
+                    let memo_date = [memoTitle,memoText,time.getFullYear()]+"|/listsplit/<br>";
+                    window.localStorage.setItem("memo1_title",memoTitle);
+                    window.localStorage.setItem("memo1_text",memoText);
+
+                    if(memoHist == undefined){
+                        window.localStorage.setItem("memo1_hist",memo_date);
+                    }
+                
+                    else{
+                        memoHist = memoHist + memo_date + "/listsplit/"
+                        window.localStorage.setItem("memo1_hist",memoHist)
+                    }
+                }
+            }
+
+            function memoHist(){
+                let histList = window.localStorage.getItem("memo1_hist");
+                let histelm = document.getElementById("memo1_hist");
+                if(histList !== null){    
+
+                    histList = histList.split("/listsplit/")
+                    histelm.innerHTML = "<p>"+histList+"</p>";
+
+                }
+                else{
+                    histelm.innerHTML = "履歴がありません";
+                }
+            }
+        </script>
+    </body>
+</html>
